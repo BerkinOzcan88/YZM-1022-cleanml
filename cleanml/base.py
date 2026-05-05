@@ -70,7 +70,7 @@ class BaseTransformer(ABC):
         Checks that the input is a pandas DataFrame.
         """
         if not isinstance(data, pd.DataFrame):
-            raise TypeError("Input data must be a pandas DataFrame.")
+            raise TypeError("Data must be a pandas DataFrame.")
     
     def _validate_columss(self, data: pd.DataFrame, columns: list[str]) -> None:
         """
