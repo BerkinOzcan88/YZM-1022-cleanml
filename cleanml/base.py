@@ -16,7 +16,7 @@ class BaseTransformer(ABC):
     def fit(
         self,
         data: pd.DataFrame ,
-        target: pd.Series | None
+        target: pd.Series | None = None
     )-> BaseTransformer:
         """
         Learns the wanted information from the dataset.
@@ -37,7 +37,7 @@ class BaseTransformer(ABC):
     def fit_transform(
         self,
         data: pd.DataFrame,
-        target: pd.Series | None
+        target: pd.Series | None = None
     )-> pd.DataFrame:
         """
         Fits the transformer and transforms the data.
@@ -72,7 +72,7 @@ class BaseTransformer(ABC):
         if not isinstance(data, pd.DataFrame):
             raise TypeError("Data must be a pandas DataFrame.")
     
-    def _validate_colunms(self, data: pd.DataFrame, columns: list[str]) -> None:
+    def _validate_columns(self, data: pd.DataFrame, columns: list[str]) -> None:
         """
         Checks if all selected columns are valid.
         

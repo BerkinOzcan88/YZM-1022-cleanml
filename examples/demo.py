@@ -1,7 +1,25 @@
-import cleanml
 import pandas as pd
 
-print(cleanml.hello())
+from cleanml import Pipeline
+from cleanml.impute import MissingValueImputer, MeanStrategy
 
-column = pd.Series([1,2,3])
-print(column.mean())
+
+df = pd.DataFrame({
+    "age": [19, 22, None, 25],
+    "salary": [25000, None, 32000, 40000]
+})
+
+pipeline = Pipeline([
+    MissingValueImputer(
+        strategy=MeanStrategy(),
+        columns=["age", "salary"]
+    )
+])
+
+clean_df = pipeline.fit_transform(df)
+
+print("Original data:")
+print(df)
+
+print("\nCleaned data:")
+print(clean_df)

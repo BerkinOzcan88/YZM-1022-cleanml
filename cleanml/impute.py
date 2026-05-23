@@ -1,12 +1,8 @@
-# ImputationStrategy X
-# MeanStrategy X
-# ModeStrategy X
-# ConstantStrategy X
-# MissingValueImputer
+from __future__ import annotations
 
 from cleanml.base import BaseTransformer 
 
-from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -43,7 +39,7 @@ class MissingValueImputer(BaseTransformer):
         self._columns = columns
         self._fill_values: dict = {}
     
-    def fit(self, data: pd.DataFrame, target : pd.Series | None):
+    def fit(self, data: pd.DataFrame, target : pd.Series | None = None):
         
         self._validate_dataframe(data)
         
@@ -51,15 +47,15 @@ class MissingValueImputer(BaseTransformer):
         self._validate_columns(data, columns_to_use)
         
         for column in columns_to_use:  
-            fill_value = self.strategy.calculate(data[column])
-            self.fill_values[column] = fill_value
+            fill_value = self._strategy.calculate(data[column])
+            self._fill_values[column] = fill_value
         
         self._mark_as_fitted()
         return self
         
     def transform(self, data: pd.DataFrame):
         
-        self._check_is_fitted()
+        self._check_if_fitted()
         self._validate_dataframe(data)
         
         columns_to_use = self._get_columns(data)
@@ -69,7 +65,7 @@ class MissingValueImputer(BaseTransformer):
         
         for column in columns_to_use:
             transformed_data[column] = transformed_data[column].fillna(
-                self.fill_values[column]
+                self._fill_values[column]
             )
         
         return transformed_data

@@ -15,7 +15,7 @@ class Pipeline(BaseTransformer):
     def fit(
         self,
         data : pd.DataFrame,
-        target : pd.Series | None
+        target : pd.Series | None = None
     )-> Pipeline:
         """
         Fits each step in order.
@@ -47,14 +47,14 @@ class Pipeline(BaseTransformer):
     
     def fit_transform(self,
         data : pd.DataFrame,
-        target : pd.Series | None
+        target : pd.Series | None = None
     )-> pd.DataFrame:
         self._validate_dataframe(data)
         
         current_data = data.copy()
         
         for step in self.steps:
-            step.fit_transform(current_data, target)
+            current_data = step.fit_transform(current_data, target)
         self._mark_as_fitted()
         
         return current_data

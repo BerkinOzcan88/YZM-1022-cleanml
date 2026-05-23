@@ -1,12 +1,5 @@
-"""
-cleanml
-
-A small machine learning preprocessing library for cleaning and preparing datasets.
-"""
+from cleanml.pipeline import Pipeline
 
 __version__ = "0.1.0"
 
-
-def hello() -> str:
-    """Return a simple message to confirm that cleanml is installed."""
-    return "cleanml is installed and ready to use!"
+__all__ = ["Pipeline"]
