@@ -2,6 +2,7 @@ import pandas as pd
 
 from cleanml import Pipeline
 from cleanml.impute import MissingValueImputer, MeanStrategy
+from cleanml.scale import StandardScaler, MinMaxScaler
 
 
 df = pd.DataFrame({
@@ -10,16 +11,10 @@ df = pd.DataFrame({
 })
 
 pipeline = Pipeline([
-    MissingValueImputer(
-        strategy=MeanStrategy(),
-        columns=["age", "salary"]
-    )
+    MissingValueImputer(strategy=MeanStrategy(), columns=["age", "salary"]),
+    MinMaxScaler(columns=["age", "salary"])
 ])
 
 clean_df = pipeline.fit_transform(df)
 
-print("Original data:")
-print(df)
-
-print("\nCleaned data:")
 print(clean_df)

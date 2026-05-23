@@ -83,3 +83,9 @@ class BaseTransformer(ABC):
         
         if invalid_columns:
             raise ValueError(f"Columns not found: {invalid_columns}")
+        
+    def _get_columns(self, data: pd.DataFrame) -> list[str]:
+        if self._columns is None:
+            return list(data.columns)
+            
+        return self._columns

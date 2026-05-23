@@ -5,7 +5,6 @@ from cleanml.base import BaseTransformer
 
 from abc import ABC, abstractmethod
 
-import numpy as np
 import pandas as pd 
 
 class ImputationStrategy(ABC):
@@ -33,7 +32,7 @@ class ModeStrategy(ImputationStrategy):
         return self.value
 
 class MissingValueImputer(BaseTransformer):
-    def __init__(self, strategy: ImputationStrategy, columns=None):
+    def __init__(self, strategy: ImputationStrategy, columns: list=None):
         super().__init__()
         self._strategy = strategy
         self._columns = columns
@@ -69,9 +68,3 @@ class MissingValueImputer(BaseTransformer):
             )
         
         return transformed_data
-    
-    def _get_columns(self, data: pd.DataFrame) -> list[str]:
-        if self._columns is None:
-            return list(data.columns)
-        
-        return self._columns
