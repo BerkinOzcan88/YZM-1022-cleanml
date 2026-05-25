@@ -24,7 +24,7 @@ class ModeStrategy(ImputationStrategy):
     def calculate(self,column: pd.Series) -> float:
         return column.mode()
 
-class ModeStrategy(ImputationStrategy):
+class ConstantStrategy(ImputationStrategy):
     def __init__(self, value):
         self.value = value
     
@@ -54,7 +54,7 @@ class MissingValueImputer(BaseTransformer):
         
     def transform(self, data: pd.DataFrame):
         
-        self._check_if_fitted()
+        self._check_is_fitted()
         self._validate_dataframe(data)
         
         columns_to_use = self._get_columns(data)

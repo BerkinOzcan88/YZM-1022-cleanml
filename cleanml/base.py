@@ -56,7 +56,7 @@ class BaseTransformer(ABC):
 
         self._is_fitted = True
         
-    def _check_if_fitted(self) -> None:
+    def _check_is_fitted(self) -> None:
         """
         Raises an error if not fitted.
         

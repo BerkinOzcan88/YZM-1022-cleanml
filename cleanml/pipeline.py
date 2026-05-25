@@ -35,7 +35,7 @@ class Pipeline(BaseTransformer):
         return self
     
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        step._check_if_fitted()
+        step._check_is_fitted()
         self._validate_dataframe(data)
         
         current_data = data.copy()

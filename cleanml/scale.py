@@ -31,7 +31,7 @@ class StandardScaler(BaseTransformer):
     
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         
-        self._check_if_fitted()
+        self._check_is_fitted()
         self._validate_dataframe(data)
         
         self._validate_columns(data, self._columns)
@@ -71,7 +71,7 @@ class MinMaxScaler(BaseTransformer):
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         
-        self._check_if_fitted()
+        self._check_is_fitted()
         self._validate_dataframe(data)
         
         self._validate_columns(data, self._columns)
