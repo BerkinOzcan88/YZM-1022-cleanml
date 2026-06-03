@@ -9,41 +9,85 @@ class Pipeline(BaseTransformer):
     def __init__(self, steps : list[BaseTransformer]):
         super().__init__()
         self.steps = steps
+        self._observers : list = []
         
         self._validate_steps()
     
     def fit(
         self,
-        data : pd.DataFrame,
-        target : pd.Series | None = None
-    )-> Pipeline:
-        """
-        Fits each step in order.
-        
-        Each step is fitted on top od the last step.
-        """
+        data: pd.DataFrame,
+        target: pd.Series | None = None
+    ) -> "Pipeline":
         self._validate_dataframe(data)
         
         current_data = data.copy()
         
-        for step in self.steps:
-            step.fit(current_data, target)
-            current_data = step.transform(current_data)
-            
-        self._mark_as_fitted()
+        self._notify("pipeline_started", {"pipeline": self})
         
-        return self
+        try:
+            for step in self.steps:
+                step_name = step.__class__.__name__
+                
+                self._notify("step_started", {
+                    "step": step,
+                    "step_name": step_name
+                })
+                
+                step.fit(current_data, target)
+                current_data = step.transform(current_data)
+                
+                self._notify("step_finished", {
+                    "step": step,
+                    "step_name": step_name
+                })
+                
+            self._mark_as_fitted()
+            
+            self._notify("pipeline_finished", {"pipeline": self})
+            
+            return self
+        
+        except Exception as error:
+            self._notify("error_occurred", {
+                "pipeline": self,
+                "error": error
+            })
+            raise
     
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        step._check_is_fitted()
+        self._check_is_fitted()
         self._validate_dataframe(data)
         
         current_data = data.copy()
         
-        for step in self.steps:
-            current_data = step.transform(current_data)
+        self._notify("pipeline_started", {"pipeline": self})
+        
+        try:
+            for step in self.steps:
+                step_name = step.__class__.__name__
+                
+                self._notify("step_started", {
+                    "step": step,
+                    "step_name": step_name
+                })
+                
+                current_data = step.transform(current_data)
+                
+                self._notify("step_finished", {
+                    "step": step,
+                    "step_name": step_name
+                })
+                
+            self._notify("pipeline_finished", {"pipeline": self})
             
-        return current_data
+            return current_data
+        
+        except Exception as error:
+            self._notify("error_occurred", {
+                "pipeline": self,
+                "error": error
+            })
+            raise
     
     def fit_transform(self,
         data : pd.DataFrame,
@@ -53,12 +97,37 @@ class Pipeline(BaseTransformer):
         
         current_data = data.copy()
         
-        for step in self.steps:
-            current_data = step.fit_transform(current_data, target)
-        self._mark_as_fitted()
+        self._notify("pipeline_started", {"pipeline": self})
         
-        return current_data
-    
+        try:
+            for step in self.steps:
+                step_name = step.__class__.__name__
+                
+                self._notify("step_started", {
+                "step": step,
+                "step_name": step_name
+                })
+            
+                current_data = step.fit_transform(current_data, target)
+            
+                self._notify("step_finished", {
+                    "step": step,
+                    "step_name": step_name
+                })
+            
+            self._mark_as_fitted()
+            
+            self._notify("pipeline_finished", {"pipeline": self})
+            
+            return current_data
+        
+        except Exception as error:
+            self._notify("error_occurred", {
+            "pipeline": self,
+            "error": error
+        })
+        raise
+        
     def _validate_steps(self) -> None:
         if not isinstance(self.steps, list):
             raise TypeError("Pipeline steps must be a list.")
@@ -68,6 +137,18 @@ class Pipeline(BaseTransformer):
         
         if not all(isinstance(step, BaseTransformer) for step in self.steps):
             raise TypeError("Every step must be a transformer.")
+    
+    def add_observer(self, observer: object) -> None:
+        self._observers.append(observer)
+    
+    def remove_observer(self, observer: object) -> None:
+        if observer in self._observers:
+            self._observers.remove(observer)
+    
+    def _notify(self, event_type: str, data: dict) -> None:
+        for observer in self._observers:
+            if hasattr(observer, "on_event") and callable(observer.on_event):
+                observer.on_event(event_type, data)
     
     def get_step_names(self) -> list[str]:
         """
