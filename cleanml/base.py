@@ -4,10 +4,10 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 class BaseTransformer(ABC):
-    """
-    Abstract base class for all the transformers.
-    
-    Every transformer should inherit from this class and implment fit and transform methods.
+    """Abstract base class for all DataFrame transformers.
+
+    Subclasses implement ``fit`` and ``transform`` and can use the helper
+    validation methods provided here.
     """
     def __init__(self):
         self._is_fitted = False
@@ -18,19 +18,26 @@ class BaseTransformer(ABC):
         data: pd.DataFrame ,
         target: pd.Series | None = None
     )-> BaseTransformer:
-        """
-        Learns the wanted information from the dataset.
-        
-        This method return itself.
+        """Learn transformation parameters from a DataFrame.
+
+        Args:
+            data: DataFrame used to fit the transformer.
+            target: Optional target values for supervised transformers.
+
+        Returns:
+            The fitted transformer instance.
         """
         pass
     
     @abstractmethod
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Applies the transformation to the dataset.
-        
-        This method returns a transformed copy of the dataset.
+        """Return a transformed copy of a DataFrame.
+
+        Args:
+            data: DataFrame to transform.
+
+        Returns:
+            A transformed copy of the input DataFrame.
         """
         pass
     
@@ -39,44 +46,46 @@ class BaseTransformer(ABC):
         data: pd.DataFrame,
         target: pd.Series | None = None
     )-> pd.DataFrame:
-        """
-        Fits the transformer and transforms the data.
-        
-        This method returns a transformed copy of the dataset.
+        """Fit the transformer and return transformed data.
+
+        Args:
+            data: DataFrame used for fitting and transforming.
+            target: Optional target values for supervised transformers.
+
+        Returns:
+            A transformed copy of the input DataFrame.
         """
         self.fit(data, target)
         return self.transform(data)
 
     def _mark_as_fitted(self) -> None:
-        """
-        Marks the transformer as fitted.
-        
-        Child classes call this method at the and of their fit() method.
-        """
+        """Mark the transformer as fitted."""
 
         self._is_fitted = True
         
     def _check_is_fitted(self) -> None:
-        """
-        Raises an error if not fitted.
-        
-        Child classes use this method to check before the transform.
+        """Raise an error if the transformer has not been fitted.
+
+        Raises:
+            RuntimeError: If the transformer is not fitted.
         """
         if not self._is_fitted:
             raise RuntimeError(f"{self.__class__.__name__} must be fitted before transforming")
 
     def _validate_dataframe(self, data: pd.DataFrame) -> None:
-        """
-        Checks that the input is a pandas DataFrame.
+        """Check that input data is a pandas DataFrame.
+
+        Raises:
+            TypeError: If data is not a pandas DataFrame.
         """
         if not isinstance(data, pd.DataFrame):
             raise TypeError("Data must be a pandas DataFrame.")
     
     def _validate_columns(self, data: pd.DataFrame, columns: list[str]) -> None:
-        """
-        Checks if all selected columns are valid.
-        
-        Raises a value error if there is columns that are not valid.
+        """Check that all selected columns exist in the DataFrame.
+
+        Raises:
+            ValueError: If any selected columns are missing.
         """
         
         invalid_columns = [col for col in columns if col not in data.columns]

@@ -5,6 +5,11 @@ from cleanml.base import BaseTransformer
 
 
 class Pipeline(BaseTransformer):
+    """Run multiple transformers sequentially on a DataFrame.
+
+    Args:
+        steps: Ordered list of transformers to fit and apply.
+    """
     
     def __init__(self, steps : list[BaseTransformer]):
         super().__init__()
@@ -18,6 +23,21 @@ class Pipeline(BaseTransformer):
         data: pd.DataFrame,
         target: pd.Series | None = None
     ) -> "Pipeline":
+        """Fit each pipeline step in order.
+
+        Each step is fitted on the output produced by the previous step.
+
+        Args:
+            data: DataFrame used to fit the pipeline.
+            target: Optional target values passed to each step.
+
+        Returns:
+            The fitted pipeline.
+
+        Raises:
+            TypeError: If data is not a pandas DataFrame.
+            Exception: Re-raises any exception from a pipeline step.
+        """
         self._validate_dataframe(data)
         
         current_data = data.copy()
@@ -55,6 +75,19 @@ class Pipeline(BaseTransformer):
             raise
     
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        """Apply each fitted pipeline step in order.
+
+        Args:
+            data: DataFrame to transform.
+
+        Returns:
+            A transformed copy of the input DataFrame.
+
+        Raises:
+            RuntimeError: If the pipeline has not been fitted.
+            TypeError: If data is not a pandas DataFrame.
+            Exception: Re-raises any exception from a pipeline step.
+        """
         self._check_is_fitted()
         self._validate_dataframe(data)
         
@@ -93,6 +126,19 @@ class Pipeline(BaseTransformer):
         data : pd.DataFrame,
         target : pd.Series | None = None
     )-> pd.DataFrame:
+        """Fit each step and return the final transformed DataFrame.
+
+        Args:
+            data: DataFrame used for fitting and transforming.
+            target: Optional target values passed to each step.
+
+        Returns:
+            A transformed copy of the input DataFrame.
+
+        Raises:
+            TypeError: If data is not a pandas DataFrame.
+            Exception: Re-raises any exception from a pipeline step.
+        """
         self._validate_dataframe(data)
         
         current_data = data.copy()
@@ -126,7 +172,7 @@ class Pipeline(BaseTransformer):
             "pipeline": self,
             "error": error
         })
-        raise
+            raise
         
     def _validate_steps(self) -> None:
         if not isinstance(self.steps, list):
@@ -139,9 +185,19 @@ class Pipeline(BaseTransformer):
             raise TypeError("Every step must be a transformer.")
     
     def add_observer(self, observer: object) -> None:
+        """Register an observer to receive pipeline events.
+
+        Args:
+            observer: Object with an ``on_event`` method.
+        """
         self._observers.append(observer)
     
     def remove_observer(self, observer: object) -> None:
+        """Remove a previously registered observer.
+
+        Args:
+            observer: Observer object to remove.
+        """
         if observer in self._observers:
             self._observers.remove(observer)
     

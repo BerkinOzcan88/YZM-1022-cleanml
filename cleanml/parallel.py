@@ -9,9 +9,17 @@ from cleanml.base import BaseTransformer
 
 
 class ParallelColumnTransformer(BaseTransformer):
+    """Run independent transformers in parallel and merge their results.
+
+    This transformer is useful when separate transformers work on different
+    columns and do not depend on each other's output.
+
+    Args:
+        transformers: Transformers to run on copies of the same input data.
+        max_workers: Optional maximum number of worker threads.
+    """
     
-    def __init__(
-        self, transformers: list[BaseTransformer], max_workers: int | None = None):
+    def __init__(self, transformers: list[BaseTransformer], max_workers: int | None = None):
         super().__init__()
         self._transformers = transformers
         self._max_workers = max_workers
@@ -20,6 +28,19 @@ class ParallelColumnTransformer(BaseTransformer):
     
     def fit(
         self, data: pd.DataFrame, target: Optional[pd.Series] = None) -> ParallelColumnTransformer:
+        """Fit all transformers in parallel.
+
+        Args:
+            data: DataFrame used to fit each transformer.
+            target: Optional target values passed to each transformer.
+
+        Returns:
+            The fitted parallel transformer.
+
+        Raises:
+            TypeError: If data is not a pandas DataFrame.
+            Exception: Re-raises any exception from a transformer.
+        """
         
         self._validate_dataframe(data)
         
@@ -36,6 +57,19 @@ class ParallelColumnTransformer(BaseTransformer):
         return self
     
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        """Transform data with all fitted transformers and merge results.
+
+        Args:
+            data: DataFrame to transform.
+
+        Returns:
+            A transformed copy of the input DataFrame.
+
+        Raises:
+            RuntimeError: If the transformer has not been fitted.
+            TypeError: If data is not a pandas DataFrame.
+            Exception: Re-raises any exception from a transformer.
+        """
         
         self._check_is_fitted()
         self._validate_dataframe(data)
@@ -52,6 +86,19 @@ class ParallelColumnTransformer(BaseTransformer):
     
     def fit_transform(
         self, data: pd.DataFrame, target: Optional[pd.Series] = None) -> pd.DataFrame:
+        """Fit and transform data with all transformers in parallel.
+
+        Args:
+            data: DataFrame used for fitting and transforming.
+            target: Optional target values passed to each transformer.
+
+        Returns:
+            A transformed copy of the input DataFrame with results merged.
+
+        Raises:
+            TypeError: If data is not a pandas DataFrame.
+            Exception: Re-raises any exception from a transformer.
+        """
         
         self._validate_dataframe(data)
         
