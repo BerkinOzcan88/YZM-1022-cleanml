@@ -42,6 +42,17 @@ def test_parallel_column_transformer_merges_added_and_dropped_columns():
     }
 
 
+def test_parallel_column_transformer_rejects_conflicting_column_changes():
+    data = pd.DataFrame({"age": [10.0, None]})
+    transformer = ParallelColumnTransformer([
+        MissingValueImputer(MeanStrategy(), columns=["age"]),
+        MissingValueImputer(ConstantStrategy(0.0), columns=["age"]),
+    ])
+
+    with pytest.raises(ValueError, match="conflicting changes.*age"):
+        transformer.fit_transform(data)
+
+
 def test_parallel_column_transformer_rejects_empty_transformer_list():
     with pytest.raises(ValueError, match="at least one transformer"):
         ParallelColumnTransformer([])

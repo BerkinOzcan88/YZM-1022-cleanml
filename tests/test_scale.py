@@ -64,6 +64,30 @@ def test_minmax_scaler_constant_column_becomes_zero():
 
 
 @pytest.mark.parametrize("scaler_class", [StandardScaler, MinMaxScaler])
+def test_scaler_rejects_non_numeric_explicit_columns(scaler_class):
+    data = pd.DataFrame({"name": ["Ada", "Bob"]})
+
+    with pytest.raises(TypeError, match="Columns must be numeric"):
+        scaler_class(columns=["name"]).fit(data)
+
+
+@pytest.mark.parametrize("scaler_class", [StandardScaler, MinMaxScaler])
+def test_scaler_columns_none_rejects_mixed_dataframe(scaler_class):
+    data = pd.DataFrame({"age": [10.0, 20.0], "name": ["Ada", "Bob"]})
+
+    with pytest.raises(TypeError, match="Columns must be numeric"):
+        scaler_class().fit(data)
+
+
+@pytest.mark.parametrize("scaler_class", [StandardScaler, MinMaxScaler])
+def test_scaler_rejects_non_numeric_transform_data(scaler_class):
+    scaler = scaler_class(columns=["age"]).fit(pd.DataFrame({"age": [10.0, 20.0]}))
+
+    with pytest.raises(TypeError, match="Columns must be numeric"):
+        scaler.transform(pd.DataFrame({"age": ["ten", "twenty"]}))
+
+
+@pytest.mark.parametrize("scaler_class", [StandardScaler, MinMaxScaler])
 def test_scaler_rejects_missing_columns(scaler_class):
     scaler = scaler_class(columns=["missing"])
 

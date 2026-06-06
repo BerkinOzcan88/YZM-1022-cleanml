@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 
 class BaseTransformer(ABC):
     """Abstract base class for all DataFrame transformers.
@@ -11,6 +12,7 @@ class BaseTransformer(ABC):
     """
     def __init__(self):
         self._is_fitted = False
+        self._columns: list[str] | None = None
     
     @abstractmethod
     def fit(
@@ -92,9 +94,24 @@ class BaseTransformer(ABC):
         
         if invalid_columns:
             raise ValueError(f"Columns not found: {invalid_columns}")
+
+    def _validate_numeric_columns(self, data: pd.DataFrame, columns: list[str]) -> None:
+        """Check that all selected columns contain numeric data.
+
+        Raises:
+            TypeError: If any selected columns are not numeric.
+        """
+
+        invalid_columns = [
+            column for column in columns
+            if not is_numeric_dtype(data[column])
+        ]
+
+        if invalid_columns:
+            raise TypeError(f"Columns must be numeric: {invalid_columns}")
         
     def _get_columns(self, data: pd.DataFrame) -> list[str]:
         if self._columns is None:
             return list(data.columns)
             
-        return self._columns
+        return list(self._columns)

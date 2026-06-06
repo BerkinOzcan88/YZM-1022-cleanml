@@ -12,7 +12,9 @@ class ParallelColumnTransformer(BaseTransformer):
     """Run independent transformers in parallel and merge their results.
 
     This transformer is useful when separate transformers work on different
-    columns and do not depend on each other's output.
+    columns and do not depend on each other's output. Transformers must change
+    independent columns; conflicting changes to the same column raise a
+    ValueError.
 
     Args:
         transformers: Transformers to run on copies of the same input data.
@@ -68,6 +70,7 @@ class ParallelColumnTransformer(BaseTransformer):
         Raises:
             RuntimeError: If the transformer has not been fitted.
             TypeError: If data is not a pandas DataFrame.
+            ValueError: If transformers change the same column.
             Exception: Re-raises any exception from a transformer.
         """
         
@@ -97,6 +100,7 @@ class ParallelColumnTransformer(BaseTransformer):
 
         Raises:
             TypeError: If data is not a pandas DataFrame.
+            ValueError: If transformers change the same column.
             Exception: Re-raises any exception from a transformer.
         """
         
@@ -118,6 +122,7 @@ class ParallelColumnTransformer(BaseTransformer):
         
         merged_data = original_data.copy()
         original_columns = set(original_data.columns)
+        changed_columns = set()
         
         for transformed_data in transformed_results:
             transformed_columns = set(transformed_data.columns)
@@ -125,10 +130,24 @@ class ParallelColumnTransformer(BaseTransformer):
             dropped_columns = original_columns - transformed_columns
             added_columns = transformed_columns - original_columns
             common_columns = original_columns & transformed_columns
+            modified_columns = {
+                column for column in common_columns
+                if not transformed_data[column].equals(original_data[column])
+            }
+            result_changed_columns = dropped_columns | added_columns | modified_columns
+            conflicting_columns = sorted(
+                changed_columns & result_changed_columns,
+                key=str,
+            )
+
+            if conflicting_columns:
+                raise ValueError(
+                    "Parallel transformers produced conflicting changes for "
+                    f"columns: {conflicting_columns}"
+                )
             
-            for column in common_columns:
-                if not transformed_data[column].equals(original_data[column]):
-                    merged_data[column] = transformed_data[column]
+            for column in modified_columns:
+                merged_data[column] = transformed_data[column]
                     
             for column in added_columns:
                 merged_data[column] = transformed_data[column]
@@ -136,6 +155,8 @@ class ParallelColumnTransformer(BaseTransformer):
             for column in dropped_columns:
                 if column in merged_data.columns:
                     merged_data = merged_data.drop(columns=[column])
+
+            changed_columns.update(result_changed_columns)
         
         return merged_data
     

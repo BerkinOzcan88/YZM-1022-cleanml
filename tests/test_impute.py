@@ -29,6 +29,20 @@ def test_median_imputer_fills_missing_numeric_values():
     assert result["score"].tolist() == [1.0, 50.5, 100.0]
 
 
+def test_mean_imputer_rejects_text_columns():
+    data = pd.DataFrame({"city": ["Ankara", None, "Istanbul"]})
+
+    with pytest.raises(TypeError, match="Column 'city' must be numeric for MeanStrategy"):
+        MissingValueImputer(MeanStrategy(), columns=["city"]).fit(data)
+
+
+def test_median_imputer_rejects_text_columns():
+    data = pd.DataFrame({"city": ["Ankara", None, "Istanbul"]})
+
+    with pytest.raises(TypeError, match="Column 'city' must be numeric for MedianStrategy"):
+        MissingValueImputer(MedianStrategy(), columns=["city"]).fit(data)
+
+
 def test_mode_imputer_uses_first_mode_scalar():
     data = pd.DataFrame({"city": ["Ankara", None, "Istanbul", "Istanbul"]})
 

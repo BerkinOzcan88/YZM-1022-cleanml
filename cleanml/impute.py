@@ -6,6 +6,13 @@ from cleanml.base import BaseTransformer
 from abc import ABC, abstractmethod
 
 import pandas as pd 
+from pandas.api.types import is_numeric_dtype
+
+
+def _validate_numeric_series(column: pd.Series, strategy_name: str) -> None:
+    if not is_numeric_dtype(column):
+        column_name = column.name if column.name is not None else "<unknown>"
+        raise TypeError(f"Column '{column_name}' must be numeric for {strategy_name}.")
 
 class ImputationStrategy(ABC):
     """Base class for missing-value imputation strategies."""
@@ -27,6 +34,7 @@ class MeanStrategy(ImputationStrategy):
 
     def calculate(self,column: pd.Series) -> float:
         """Return the mean value of a column."""
+        _validate_numeric_series(column, self.__class__.__name__)
         return column.mean()
 
 class MedianStrategy(ImputationStrategy):
@@ -34,6 +42,7 @@ class MedianStrategy(ImputationStrategy):
 
     def calculate(self,column: pd.Series) -> float:
         """Return the median value of a column."""
+        _validate_numeric_series(column, self.__class__.__name__)
         return column.median()
 
 class ModeStrategy(ImputationStrategy):

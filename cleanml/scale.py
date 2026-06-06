@@ -39,6 +39,7 @@ class StandardScaler(BaseTransformer):
         
         columns_to_use = self._get_columns(data)
         self._validate_columns(data, columns_to_use)
+        self._validate_numeric_columns(data, columns_to_use)
         self._fitted_columns = columns_to_use
         
         for column in columns_to_use:
@@ -67,6 +68,7 @@ class StandardScaler(BaseTransformer):
         self._validate_dataframe(data)
         
         self._validate_columns(data, self._fitted_columns)
+        self._validate_numeric_columns(data, self._fitted_columns)
         
         transformed_data = data.copy()
         
@@ -112,6 +114,7 @@ class MinMaxScaler(BaseTransformer):
         
         columns_to_use = self._get_columns(data)
         self._validate_columns(data, columns_to_use)
+        self._validate_numeric_columns(data, columns_to_use)
         self._fitted_columns = columns_to_use
         
         for column in columns_to_use:
@@ -140,6 +143,7 @@ class MinMaxScaler(BaseTransformer):
         self._validate_dataframe(data)
         
         self._validate_columns(data, self._fitted_columns)
+        self._validate_numeric_columns(data, self._fitted_columns)
         
         transformed_data = data.copy()
         
