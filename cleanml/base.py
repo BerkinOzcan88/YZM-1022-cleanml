@@ -10,7 +10,7 @@ class BaseTransformer(ABC):
     Subclasses implement ``fit`` and ``transform`` and can use the helper
     validation methods provided here.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self._is_fitted = False
         self._columns: list[str] | None = None
     

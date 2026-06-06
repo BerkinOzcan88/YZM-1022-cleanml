@@ -51,7 +51,7 @@ class CategoryTypoFixer(BaseTransformer):
             every value is replaced by its closest valid category.
     """
     
-    def __init__(self, column: str, valid_categories: list[str], max_distance: int | None = 2):
+    def __init__(self, column: str, valid_categories: list[str], max_distance: int | None = 2) -> None:
         super().__init__()
         self._column = column
         self._valid_categories = valid_categories

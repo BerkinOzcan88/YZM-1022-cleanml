@@ -21,7 +21,7 @@ class ParallelColumnTransformer(BaseTransformer):
         max_workers: Optional maximum number of worker threads.
     """
     
-    def __init__(self, transformers: list[BaseTransformer], max_workers: int | None = None):
+    def __init__(self, transformers: list[BaseTransformer], max_workers: int | None = None) -> None:
         super().__init__()
         self._transformers = transformers
         self._max_workers = max_workers

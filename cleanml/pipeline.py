@@ -11,7 +11,7 @@ class Pipeline(BaseTransformer):
         steps: Ordered list of transformers to fit and apply.
     """
     
-    def __init__(self, steps : list[BaseTransformer]):
+    def __init__(self, steps : list[BaseTransformer]) -> None:
         super().__init__()
         self.steps = steps
         self._observers : list = []

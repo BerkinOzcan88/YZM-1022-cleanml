@@ -15,7 +15,7 @@ class OneHotEncoder(BaseTransformer):
         drop_original: Whether to remove original categorical columns.
     """
 
-    def __init__(self, columns: list, drop_original: bool=True):
+    def __init__(self, columns: list[str], drop_original: bool=True) -> None:
         super().__init__()
         self._columns = columns
         self._drop_original = drop_original
@@ -88,7 +88,7 @@ class LabelEncoder(BaseTransformer):
         columns: Categorical columns to encode.
     """
     
-    def __init__(self, columns: list):
+    def __init__(self, columns: list[str]) -> None:
         super().__init__()
         self._columns = columns
         self._mappings: dict = {}

@@ -13,7 +13,7 @@ class StandardScaler(BaseTransformer):
         columns: Columns to scale. If None, all columns are used.
     """
     
-    def __init__(self, columns: list | None = None):
+    def __init__(self, columns: list[str] | None = None) -> None:
         super().__init__()
         self._columns = columns
         self._means = {}
@@ -88,7 +88,7 @@ class MinMaxScaler(BaseTransformer):
         columns: Columns to scale. If None, all columns are used.
     """
 
-    def __init__(self, columns: list | None = None):
+    def __init__(self, columns: list[str] | None = None) -> None:
         super().__init__()
         self._columns = columns
         self._maxs = {}

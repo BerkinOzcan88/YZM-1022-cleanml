@@ -33,7 +33,7 @@ def create_demo_csv() -> None:
     df.to_csv(DATA_PATH, index=False)
 
 
-def main():
+def main() -> None:
     create_demo_csv()
 
     loader = DataLoaderFactory.from_file_path(str(DATA_PATH))

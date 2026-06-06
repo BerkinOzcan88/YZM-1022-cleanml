@@ -18,7 +18,7 @@ class ImputationStrategy(ABC):
     """Base class for missing-value imputation strategies."""
 
     @abstractmethod
-    def calculate(self,column: pd.Series) -> float:
+    def calculate(self,column: pd.Series) -> object:
         """Calculate the replacement value for a column.
 
         Args:
@@ -32,7 +32,7 @@ class ImputationStrategy(ABC):
 class MeanStrategy(ImputationStrategy):
     """Use the column mean as the fill value."""
 
-    def calculate(self,column: pd.Series) -> float:
+    def calculate(self,column: pd.Series) -> object:
         """Return the mean value of a column."""
         _validate_numeric_series(column, self.__class__.__name__)
         return column.mean()
@@ -40,7 +40,7 @@ class MeanStrategy(ImputationStrategy):
 class MedianStrategy(ImputationStrategy):
     """Use the column median as the fill value."""
 
-    def calculate(self,column: pd.Series) -> float:
+    def calculate(self,column: pd.Series) -> object:
         """Return the median value of a column."""
         _validate_numeric_series(column, self.__class__.__name__)
         return column.median()
@@ -48,7 +48,7 @@ class MedianStrategy(ImputationStrategy):
 class ModeStrategy(ImputationStrategy):
     """Use the first column mode as the fill value."""
 
-    def calculate(self,column: pd.Series) -> float:
+    def calculate(self,column: pd.Series) -> object:
         """Return the first mode value of a column.
 
         Returns:
@@ -66,10 +66,10 @@ class ConstantStrategy(ImputationStrategy):
         value: Value used to replace missing values.
     """
 
-    def __init__(self, value):
+    def __init__(self, value: object) -> None:
         self.value = value
     
-    def calculate(self, column: pd.Series) -> float:
+    def calculate(self, column: pd.Series) -> object:
         """Return the configured constant value."""
         return self.value
 
@@ -81,13 +81,13 @@ class MissingValueImputer(BaseTransformer):
         columns: Columns to impute. If None, all columns are used.
     """
 
-    def __init__(self, strategy: ImputationStrategy, columns: list=None):
+    def __init__(self, strategy: ImputationStrategy, columns: list[str] | None=None) -> None:
         super().__init__()
         self._strategy = strategy
         self._columns = columns
         self._fill_values: dict = {}
     
-    def fit(self, data: pd.DataFrame, target : pd.Series | None = None):
+    def fit(self, data: pd.DataFrame, target : pd.Series | None = None) -> MissingValueImputer:
         """Learn fill values from the input DataFrame.
 
         Args:
@@ -114,7 +114,7 @@ class MissingValueImputer(BaseTransformer):
         self._mark_as_fitted()
         return self
         
-    def transform(self, data: pd.DataFrame):
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         """Return a copy of the data with missing values filled.
 
         Args:
