@@ -12,7 +12,7 @@ line-only script.
 ## Installation
 
 ```bash
-pip install -e .
+pip install .
 ```
 
 ## Quick Start
