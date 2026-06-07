@@ -93,7 +93,7 @@ def replace_spaces_in_column_names(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def drop_columns(*columns: str) -> DataFrameFunction:
-    """Create a function that drops selected columns if they exist.
+    """Creatse a function that drops selected columns if they exist.
 
     Args:
         *columns: Column names to drop.
